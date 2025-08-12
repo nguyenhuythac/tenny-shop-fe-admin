@@ -6,23 +6,32 @@ import Column from 'antd/es/table/Column';
 import { Button, Space, Table, Tag, Modal } from 'antd';
 
 import { EditOutlined, DeleteOutlined, ExclamationCircleOutlined } from '@ant-design/icons';
+import { connect } from 'react-redux';
+import { clearCategoryState, getCategories } from '../../redux/actions/categoryAction';
 
 class ListCategory extends Component {
     constructor() {
         super();
         this.state = {
-            dataSource: [
-                { categoryId: 1, name: 'Computer', status: 0 },
-                { categoryId: 2, name: 'Laptop', status: 0 },
-                { categoryId: 3, name: 'PC', status: 1 },
-                { categoryId: 4, name: 'Mouse', status: 1 },
-                { categoryId: 5, name: 'Server', status: 0 },
-            ],
+            // dataSource: [
+                
+            // ],
             category: {
 
             }
         }
     };
+
+    componentDidMount = () => {
+        console.log('ListCategory component mounted');
+        this.props.getCategories();
+    }
+
+    componentWillUnmount= () => {
+        console.log('ListCategory component will unmount');
+        this.props.clearCategoryState();
+    }
+
 
     editCategory = (category) => {
         console.log(category);
@@ -47,6 +56,7 @@ class ListCategory extends Component {
     };
   render() {
     const { navigate } = this.props.router;
+    const { categories } = this.props;
     return (
       <>
         <ContentHeader 
@@ -55,14 +65,14 @@ class ListCategory extends Component {
             title="Danh sách danh mục"
         ></ContentHeader>
         <Table 
-            dataSource= {this.state.dataSource}
+            dataSource= {categories}
             size="small"
-            rowKey="categoryId"
+            rowKey="id"
         >
             <Column 
                 title="Category ID" 
-                key="categoryId" 
-                dataIndex="categoryId" 
+                key="id" 
+                dataIndex="id" 
                 with={40} 
                 align='center'
             ></Column>
@@ -79,7 +89,7 @@ class ListCategory extends Component {
                 render={(_, { status } ) => {
                     let color = 'volcano';
                     let name = 'In-visible';
-                    if(status === 0){
+                    if(status === "Visible"){
                         color = 'green';
                         name = 'Visible';
                     }
@@ -110,4 +120,14 @@ class ListCategory extends Component {
   }
 }
 
-export default withRouter(ListCategory);
+
+const mapStateToProps = (state) => ({
+    categories: state.categoryReducer.categories,
+})
+
+const mapDispatchToProps = {
+    getCategories,
+    clearCategoryState
+}
+
+export default withRouter(connect(mapStateToProps, mapDispatchToProps)(ListCategory))

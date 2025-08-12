@@ -2,10 +2,15 @@ import React, { Component } from 'react'
 import withRouter from '../../helpers/withRouter'
 import { Button, Col, Divider, Form, Input, Row, Select } from 'antd';
 import ContentHeader from '../common/ContentHeader';
+import { connect } from 'react-redux'
+import { insertCategory } from '../../redux/actions/categoryAction';
 
 class AddOrEditCategory extends Component {
     onSubmitForm = (values) => {
         console.log('Form values:', values);
+        const {navigate} = this.props.router;
+
+        this.props.insertCategory(values, navigate);
     }
 
   render() {
@@ -42,4 +47,13 @@ class AddOrEditCategory extends Component {
   }
 }
 
-export default withRouter(AddOrEditCategory);
+
+const mapStateToProps = (state) => ({
+    category: state.categoryReducer.category,
+})
+
+const mapDispatchToProps = {
+    insertCategory,
+}
+
+export default withRouter(connect(mapStateToProps, mapDispatchToProps)(AddOrEditCategory));
