@@ -15,7 +15,7 @@ import Home from '../components/home/Home';
 import AddOrEditCategory from '../components/categories/AddOrEditCategory';
 import ListCategory from '../components/categories/ListCategory';
 import { useDispatch, useSelector } from 'react-redux';
-import { setMessage } from '../redux/actions/commonAction';
+import { setError, setMessage } from '../redux/actions/commonAction';
 
 const { Header, Sider, Content } = Layout;
 function DashboardPage() {
@@ -25,6 +25,7 @@ function DashboardPage() {
     const navigate = useNavigate();
 
     const msg = useSelector(state => state.commonReducer.message);
+    const err = useSelector(state => state.commonReducer.error);
     const dispatch = useDispatch();
 
     useEffect(() => {
@@ -32,7 +33,11 @@ function DashboardPage() {
             dispatch(setMessage(""))
             message.success(msg);
         }
-    }, [msg, dispatch]);
+        if (err) {
+            dispatch(setError(""))
+            message.error(err);
+        }
+    }, [msg, err]);
 
     const siteLayoutStyle = {marginLeft:marginLeft};
     const {
@@ -170,7 +175,8 @@ function DashboardPage() {
             <div className='content-panel'>
               <Routes>
                   <Route path='/' element={<Home />}></Route>
-                  <Route path='/categories/add' element={<AddOrEditCategory />}></Route>
+                  <Route path='/categories/add' element={<AddOrEditCategory key='a' />}></Route>
+                  <Route path='/categories/update/:id' element={<AddOrEditCategory key='u' />}></Route>
                   <Route path='/categories/list' element={<ListCategory />}></Route>
                 </Routes>
                 <Outlet></Outlet>

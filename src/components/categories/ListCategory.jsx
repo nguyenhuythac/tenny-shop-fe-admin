@@ -3,22 +3,17 @@ import withRouter from '../../helpers/withRouter'
 import ContentHeader from '../common/ContentHeader';
 import Column from 'antd/es/table/Column';
 
-import { Button, Space, Table, Tag, Modal } from 'antd';
+import { Button, Space, Table, Tag, Modal, Skeleton } from 'antd';
 
 import { EditOutlined, DeleteOutlined, ExclamationCircleOutlined } from '@ant-design/icons';
 import { connect } from 'react-redux';
-import { clearCategoryState, getCategories } from '../../redux/actions/categoryAction';
+import { clearCategoryState, deleteCategory, getCategories } from '../../redux/actions/categoryAction';
 
 class ListCategory extends Component {
     constructor() {
         super();
         this.state = {
-            // dataSource: [
-                
-            // ],
-            category: {
-
-            }
+            category: {}
         }
     };
 
@@ -35,10 +30,13 @@ class ListCategory extends Component {
 
     editCategory = (category) => {
         console.log(category);
+        const { navigate } = this.props.router;
+        navigate(`/categories/update/${category.id}`);
     };
 
-    deleteCategory = () => {
+    deleteCategory = (id) => {
         console.log('Delete category:', this.state.category);
+        this.props.deleteCategory(id);
     };
 
     openDeleteConfirmModal = (category) => {
@@ -49,21 +47,28 @@ class ListCategory extends Component {
             title: 'Are you sure?',
             icon: <ExclamationCircleOutlined />,
             content: message,
-            onOk: () => this.deleteCategory(), 
+            onOk: () => this.deleteCategory(category.id), 
             okText: 'Delete',
             cancelText: 'Cancel',
         });
     };
   render() {
     const { navigate } = this.props.router;
-    const { categories } = this.props;
+    const { categories, isLoading } = this.props;
+    if(isLoading){
+        return (
+            <>
+                <ContentHeader 
+                navigate={navigate}
+                className="site-page-header"
+                title="Danh sách danh mục"
+                ></ContentHeader>
+                <Skeleton active />
+            </>
+        );
+    }
     return (
       <>
-        <ContentHeader 
-            navigate={navigate}
-            className="site-page-header"
-            title="Danh sách danh mục"
-        ></ContentHeader>
         <Table 
             dataSource= {categories}
             size="small"
@@ -123,11 +128,13 @@ class ListCategory extends Component {
 
 const mapStateToProps = (state) => ({
     categories: state.categoryReducer.categories,
+    isLoading: state.commonReducer.isLoading,
 })
 
 const mapDispatchToProps = {
     getCategories,
-    clearCategoryState
+    clearCategoryState,
+    deleteCategory
 }
 
 export default withRouter(connect(mapStateToProps, mapDispatchToProps)(ListCategory))
